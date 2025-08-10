@@ -1,0 +1,23 @@
+#SQL SCHEMAS of DB
+SCHEMA_PATH: "database/raw_schema.sql"
+STAGE_SCHEMA_PATH: "database/stage_schema.sql"
+
+# Chunk size for loading data
+CHUNK_SIZE: 5000
+
+# Data Paths
+RAW_DATA_DIR: "data/raw/"
+CLEANED_DATA_DIR: "data/processed/"
+
+# CSV
+CUSTOMERS_PATH: "olist_customers_dataset.csv"
+GEOLOCATION_PATH: "olist_geolocation_dataset.csv"
+ORDERS_PATH: "olist_orders_dataset.csv"
+ORDER_ITEMS_PATH: "olist_order_items_dataset.csv"
+ORDER_PAYMENTS_PATH: "olist_order_payments_dataset.csv"
+ORDER_REVIEWS_PATH: "olist_order_reviews_dataset.csv"
+PRODUCTS_PATH: "olist_products_dataset.csv"
+CATEGORIES_PATH: "product_category_name_translation.csv"
+SELLERS_PATH: "olist_sellers_dataset.csv"
+
+
