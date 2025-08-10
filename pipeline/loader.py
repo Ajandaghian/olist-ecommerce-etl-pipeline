@@ -1,9 +1,13 @@
 from config.config import config
+from config.log_config import get_logger
 import os
 from dotenv import load_dotenv
 import pandas as pd
 from sqlalchemy import create_engine, text
 from snowflake.sqlalchemy import URL
+
+logger = get_logger(__name__)
+
 
 #TODO:
 # - Implement the logic to load data into PostgreSQL
@@ -19,15 +23,17 @@ class DataLoader():
         **Make sure you have created the schema in the target database before loading data.**
 
         Args:
-            source (str): The source of the data, e.g., 'Postgres', 'Snowflake'.
+            source (str): The source of the data, e.g., 'postgres', 'snowflake'.
             dataframe (pd.DataFrame | list): The DataFrame or list of DataFrames containing the data to be loaded.
             dataframe_table_mapping (dict): A mapping of DataFrame names to target table.
                 the keys are the dataframe and the values are the table names.
                     {table_name: dataframe}
         """
+
         load_dotenv()
-        if source not in ['Postgres', 'Snowflake']:
-            raise ValueError("Unsupported source type. Supported types are: 'Postgres', 'Snowflake'.")
+
+        if source not in ['postgres', 'snowflake']:
+            raise ValueError("Unsupported source type. Supported types are: 'postgres', 'snowflake'.")
         self.source = source
         self.dataframe_table_mapping = dataframe_table_mapping
         self.schema = schema
@@ -36,19 +42,30 @@ class DataLoader():
     def _connection(self):
         """Create a connection to the data source."""
 
-        if self.source == 'Postgres':
+        if self.source == 'postgres':
             engine = create_engine(f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}")
             self.connector = engine
             return engine
 
-        elif self.source == 'Snowflake':
-            engine = create_engine(URL(
-                user=os.getenv('SNOWFLAKE_USER'),
-                password=os.getenv('SNOWFLAKE_PASSWORD'),
-                account=os.getenv('SNOWFLAKE_ACCOUNT'),
-                database=os.getenv('SNOWFLAKE_DATABASE'),
-                warehouse=os.getenv('SNOWFLAKE_WAREHOUSE')
-            ))
+        elif self.source == 'snowflake':
+            # engine = create_engine(URL(
+            #     user=os.getenv('SNOWFLAKE_USER'),
+            #     password=os.getenv('SNOWFLAKE_PASSWORD'),
+            #     account=os.getenv('SNOWFLAKE_ACCOUNT'),
+            #     database=os.getenv('SNOWFLAKE_DATABASE'),
+            #     warehouse=os.getenv('SNOWFLAKE_WAREHOUSE')
+            # ))
+
+            engine = create_engine(
+                'snowflake://{user}:{password}@{account}/{database}/{schema}?warehouse={warehouse}'.format(
+                    user=os.getenv("SNOWFLAKE_USER"),
+                    password=os.getenv("SNOWFLAKE_PASSWORD"),
+                    account=os.getenv("SNOWFLAKE_ACCOUNT"),   # e.g., xy12345.eu-central-1
+                    database=os.getenv("SNOWFLAKE_DATABASE"),
+                    schema=os.getenv("SNOWFLAKE_SCHEMA"),
+                    warehouse=os.getenv("SNOWFLAKE_WAREHOUSE")
+                )
+            )
 
             self.connector = engine
             return engine
@@ -64,22 +81,27 @@ class DataLoader():
         pass
 
     def _snowflake_load_data(self):
-        """Load data into Snowflake."""
+        """Load data into snowflake."""
 
-        if self.connector is None:
-            self.connector = self._connection()
+        try:
+            if self.connector is None:
+                self.connector = self._connection()
+                logger.info("Connected to Snowflake successfully.")
 
-        for table_name, df in self.dataframe_table_mapping.items():
-            with self.connector.begin() as conn:
+            for table_name, df in self.dataframe_table_mapping.items():
                 df.to_sql(
                     table_name,
-                    con=conn,
+                    con=self.connector,
                     schema=self.schema,
                     if_exists='append',
                     index=False,
                     chunksize=config['CHUNK_SIZE']
                 )
-                print(f"Data loaded into {table_name} table in Snowflake.")
+                logger.info(f"###Data loaded into {table_name} table in snowflake.")
+        except Exception as e:
+            logger.error(f"Error loading data into Snowflake: {e}")
+            self._close_connection()
+            raise
 
     def _csv_load_data(self):
         """Load data from CSV files into the target database."""
@@ -91,7 +113,7 @@ class DataLoader():
     def load_data(self):
         """Load data into the target database."""
 
-        if self.source == 'Snowflake':
+        if self.source == 'snowflake':
             self._snowflake_load_data()
 
         elif self.source == 'CSV':
@@ -101,3 +123,21 @@ class DataLoader():
             raise ValueError("Unsupported source type")
 
         self._close_connection()
+
+
+if __name__ == "__main__":
+    # Example: Load multiple Olist tables
+
+    order = pd.DataFrame()
+
+    df_mapping = {
+        'orders': pd.read_csv('data/raw/olist_orders_dataset.csv').head(),
+    }
+
+    loader = DataLoader(
+        source='snowflake',
+        dataframe_table_mapping=df_mapping,
+        schema='stage'
+    )
+
+    loader.load_data()
