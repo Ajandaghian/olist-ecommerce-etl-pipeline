@@ -1,10 +1,11 @@
+import os
+
+import pandas as pd
+from dotenv import load_dotenv
+
 from config.config import config
 from config.log_config import get_logger
-import os
-from dotenv import load_dotenv
-import pandas as pd
-from sqlalchemy import create_engine, text
-from snowflake.sqlalchemy import URL
+from pipeline.base_db_connection import BaseDBConnection
 
 logger = get_logger(__name__)
 
@@ -12,12 +13,11 @@ logger = get_logger(__name__)
 #TODO:
 # - Implement the logic to load data into PostgreSQL
 # - Add error handling for database connections and data loading
-# - Add logging instead of print statements
 # - Checking for empty DataFrames before loading
 # - Ensure the schema exists before loading data
 
 
-class DataLoader():
+class DataLoader(BaseDBConnection):
     def __init__(self, source: str, *, dataframe_table_mapping: dict, schema: str):
         """Initialize the DataLoader with configuration and source.
         **Make sure you have created the schema in the target database before loading data.**
@@ -38,44 +38,6 @@ class DataLoader():
         self.dataframe_table_mapping = dataframe_table_mapping
         self.schema = schema
         self.connector = None
-
-    def _connection(self):
-        """Create a connection to the data source."""
-
-        if self.source == 'postgres':
-            engine = create_engine(f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}")
-            self.connector = engine
-            return engine
-
-        elif self.source == 'snowflake':
-            engine = create_engine(URL(
-                user=os.getenv('SNOWFLAKE_USER'),
-                password=os.getenv('SNOWFLAKE_PASSWORD'),
-                account=os.getenv('SNOWFLAKE_ACCOUNT'),
-                database=os.getenv('SNOWFLAKE_DATABASE'),
-                warehouse=os.getenv('SNOWFLAKE_WAREHOUSE')
-            ))
-
-            engine = create_engine(
-                'snowflake://{user}:{password}@{account}/{database}/{schema}?warehouse={warehouse}'.format(
-                    user=os.getenv("SNOWFLAKE_USER"),
-                    password=os.getenv("SNOWFLAKE_PASSWORD"),
-                    account=os.getenv("SNOWFLAKE_ACCOUNT"),
-                    database=os.getenv("SNOWFLAKE_DATABASE"),
-                    schema=os.getenv("SNOWFLAKE_SCHEMA"),
-                    warehouse=os.getenv("SNOWFLAKE_WAREHOUSE")
-                )
-            )
-
-            self.connector = engine
-            return engine
-
-    def _close_connection(self):
-        if self.connector is not None:
-            if hasattr(self.connector, 'dispose'):
-                self.connector.dispose()
-            else:
-                self.connector.close()
 
     def _postgres_load_data(self):
         """Load data into PostgreSQL."""

@@ -6,18 +6,18 @@ from sqlalchemy import create_engine, text
 
 from config.config import config
 from config.log_config import get_logger
+from pipeline.base_db_connection import BaseDBConnection
 
 logger = get_logger(__name__)
 
 #TODO:
-# - Implement the logic to extract data from PostgreSQL
 # - Unifying the connection logic for DataLoader
 # - Add error handling for database connections and data extraction
 # - Add logging instead of print statements
 # - Ensure the schema exists before extracting data
 
 
-class DataExtractor():
+class DataExtractor(BaseDBConnection):
     def __init__(self, source: str , *, file_paths: dict = None):
         """Initialize the DataExtractor with configuration and source.
         Args:
@@ -26,8 +26,8 @@ class DataExtractor():
                 for example: {'orders': 'path/to/orders.csv', 'products': 'path/to/products.csv'}
         """
 
-        if source not in ['CSV']:   #, 'Postgres', 'Snowflake']:
-            raise ValueError("Unsupported source type. Supported types are: 'CSV' ") #'Postgres', 'Snowflake'.")
+        if source not in ['CSV']:
+            raise ValueError("Unsupported source type. Supported types are: 'CSV' ")
         self.source = source
 
         if source == 'CSV' and not file_paths:
@@ -37,45 +37,6 @@ class DataExtractor():
 
         self.connector = None
         load_dotenv()
-
-    def _connection(self):
-        """Create a connection to the data source."""
-
-        if self.source == 'CSV':
-            # For CSV, no connection is needed, just return None
-            self.connector = None
-            return None
-
-        if self.source == 'Postgres':
-            engine = create_engine(f"postgresql+psycopg2://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}")
-            self.connector = engine
-            return engine
-
-        elif self.source == 'Snowflake':
-            conn = create_engine(
-                        'snowflake://{user}:{password}@{account}/{database}/{schema}?warehouse={warehouse}'.format(
-                            user=os.getenv("SNOWFLAKE_USER"),
-                            password=os.getenv("SNOWFLAKE_PASSWORD"),
-                            account=os.getenv("SNOWFLAKE_ACCOUNT"),
-                            database=os.getenv("SNOWFLAKE_DATABASE"),
-                            schema=os.getenv("SNOWFLAKE_SCHEMA"),
-                            warehouse=os.getenv("SNOWFLAKE_WAREHOUSE")
-                        )
-                    )
-
-            self.connector = conn
-            return conn
-
-        else:
-            raise ValueError("Unsupported source type")
-
-    def _close_connection(self):
-        if self.connector is not None:
-            if hasattr(self.connector, 'dispose'):
-                self.connector.dispose()
-            else:
-                self.connector.close()
-
 
     def _csv_extract_data(self) -> dict[str, pd.DataFrame]:
         """Extract data from a CSV file."""
