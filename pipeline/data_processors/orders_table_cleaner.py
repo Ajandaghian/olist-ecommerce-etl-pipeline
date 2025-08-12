@@ -77,9 +77,9 @@ class OrdersCleaner(BaseDataCleaner):
             self.cleaned_data = self.cleaned_data.drop_duplicates(subset=['order_id'], keep='first')
 
             (self
-             .data_type_validation(data_type_mapping.get('Orders'))
-             ._validate_order_status_dates()
-             ._validate_timestamps_business_logic())
+                .data_type_validation(data_type_mapping.get('Orders'))
+                ._validate_order_status_dates()
+                ._validate_timestamps_business_logic())
 
             logger.info("Orders cleaning process completed")
             return self.cleaned_data
@@ -89,8 +89,9 @@ class OrdersCleaner(BaseDataCleaner):
             raise
 
 
+
 if __name__ == "__main__":
-    raw_orders_data = pd.read_csv(config['RAW_DATA_DIR'] + config['ORDERS_PATH'])  # Replace with actual DataFrame
+    raw_orders_data = pd.read_csv(config['RAW_DATA_DIR'] + config['ORDERS_PATH'])
     cleaned_orders = OrdersCleaner(raw_orders_data).clean()
     print(cleaned_orders.shape)
     print(cleaned_orders.dtypes)

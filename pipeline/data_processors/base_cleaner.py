@@ -3,42 +3,11 @@
 
 from abc import ABC, abstractmethod
 from typing import List
+import pandas as pd
+
 from config.log_config import get_logger
 
 logger = get_logger(__name__)
-
-import pandas as pd
-
-
-class BaseDataCleaner(ABC):
-    def __init__(self, raw_data: pd.DataFrame):
-        self.raw_data = raw_data.copy()
-        self.cleaned_data = raw_data.copy()
-
-    def data_type_validation(self, mapping: dict):
-        for column, expected_type in mapping.items():
-            if column in self.cleaned_data.columns:
-                actual_type = self.cleaned_data[column].dtype
-                if actual_type != expected_type:
-                    try:
-                        self.cleaned_data[column] = self.cleaned_data[column].astype(expected_type)
-                    except ValueError:
-                        logger.error(f"Column '{column}' expected type {expected_type}, but got {actual_type}.")
-                        raise
-        logger.debug("Data type validation completed successfully.")
-        return self
-
-    @abstractmethod
-    def clean(self) -> pd.DataFrame:
-        """Must be implemented by subclasses."""
-        pass
-
-class PassCleaningPipeline(BaseDataCleaner):
-    """A cleaner that does nothing, used for testing or as a placeholder."""
-
-    def clean(self) -> pd.DataFrame:
-        logger.info("No cleaning operations performed.")
-        return self.cleaned_data
 
 
 data_type_mapping = {
@@ -122,3 +91,37 @@ data_type_mapping = {
         'product_category_name_english': 'string'
     }
 }
+
+
+class BaseDataCleaner(ABC):
+    def __init__(self, raw_data: pd.DataFrame, table_name: str):
+        self.raw_data = raw_data.copy()
+        self.cleaned_data = raw_data.copy()
+        self.table_name = table_name
+
+    def data_type_validation(self, mapping: dict):
+        for column, expected_type in mapping.items():
+            if column in self.cleaned_data.columns:
+                actual_type = self.cleaned_data[column].dtype
+                if actual_type != expected_type:
+                    try:
+                        self.cleaned_data[column] = self.cleaned_data[column].astype(expected_type)
+                    except ValueError:
+                        logger.error(f"Column '{column}' expected type {expected_type}, but got {actual_type}.")
+                        raise
+        logger.debug("Data type validation completed successfully.")
+        return self
+
+    @abstractmethod
+    def clean(self) -> pd.DataFrame:
+        """Must be implemented by subclasses."""
+        pass
+
+    def clean(self):
+        self.cleaned_data = self.raw_data.copy()
+        self.cleaned_data = self.cleaned_data.drop_duplicates(keep='first')
+
+        (self
+            .data_type_validation(data_type_mapping.get(self.table_name)))
+
+        return self.cleaned_data
