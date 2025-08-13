@@ -1,4 +1,6 @@
 from etl_pipeline import ETLPipeline
+from config.config import config
+
 import os
 from dotenv import load_dotenv
 
@@ -12,15 +14,15 @@ if __name__ == "__main__":
         'extractor_pipeline_args': {
             'extractor_source': os.getenv('EXTRACT_SOURCE'),
             'file_paths': {
-                        # 'customers': os.getenv('CUSTOMERS_PATH'),
-                        #'geolocation': os.getenv('GEOLOCATION_PATH'),
-                        'orders': os.getenv('ORDERS_PATH'),
-                        # 'order_items': os.getenv('ORDER_ITEMS_PATH'),
-                        # 'order_payments': os.getenv('ORDER_PAYMENTS_PATH'),
-                        # 'order_reviews': os.getenv('ORDER_REVIEWS_PATH'),
-                        # 'products': os.getenv('PRODUCTS_PATH'),
-                        # 'categories': os.getenv('CATEGORIES_PATH'),
-                        # 'sellers': os.getenv('SELLERS_PATH')
+                        config['CUSTOMERS_TABLE']: os.getenv('CUSTOMERS_PATH'),
+                        config['GEOLOCATION_TABLE']: os.getenv('GEOLOCATION_PATH'),
+                        config['ORDERS_TABLE']: os.getenv('ORDERS_PATH'),
+                        config['ORDER_ITEMS_TABLE']: os.getenv('ORDER_ITEMS_PATH'),
+                        config['ORDER_PAYMENTS_TABLE']: os.getenv('ORDER_PAYMENTS_PATH'),
+                        config['ORDER_REVIEWS_TABLE']: os.getenv('ORDER_REVIEWS_PATH'),
+                        config['PRODUCTS_TABLE']: os.getenv('PRODUCTS_PATH'),
+                        config['CATEGORIES_TABLE']: os.getenv('CATEGORIES_PATH'),
+                        config['SELLERS_TABLE']: os.getenv('SELLERS_PATH')
                             }
                 },
         'loading_pipeline_args': {

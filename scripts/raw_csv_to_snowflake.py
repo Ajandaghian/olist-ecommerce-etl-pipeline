@@ -4,7 +4,7 @@ from pipeline.extractor import DataExtractor
 
 
 if __name__ == "__main__":
-    SCHEMA = 'RAW'
+    SCHEMA = 'test'
 
     table_paths_mapping = {
         "customers": config['RAW_DATA_DIR'] + config['CUSTOMERS_PATH'],
@@ -23,5 +23,7 @@ if __name__ == "__main__":
     DataLoader(
         source='snowflake',
         dataframe_table_mapping=data,
-        schema=SCHEMA).load_data()
+        schema=SCHEMA
+        ).load_data()
+
 

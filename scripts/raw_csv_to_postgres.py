@@ -2,7 +2,7 @@ from config.config import config
 import os
 from dotenv import load_dotenv
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 import pathlib
 
 DIR = pathlib.Path(__file__).parent.parent
