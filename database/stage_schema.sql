@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS stage.geolocation (
 );
 
 -- Product category translation table
-CREATE TABLE IF NOT EXISTS stage.product_category_name_translation (
+CREATE TABLE IF NOT EXISTS stage.product_category (
     product_category_name VARCHAR(100),
     product_category_name_english VARCHAR(100)
 );
