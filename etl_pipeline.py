@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 
 from config.log_config import get_logger
@@ -42,12 +41,12 @@ class ETLPipeline:
             ).extract()
 
             logger.info("📥 Data extraction completed and 🔄 Starting data transformation")
-            # transformer = DataCleaningPipeline(ext).run()
+            transformer = DataCleaningPipeline(ext).run()
 
             logger.info("🧹 Data transformation completed and 💾 Starting data loading")
             DataLoader(
                 source=self.loading_settings.get('source'),
-                dataframe_table_mapping=ext,
+                dataframe_table_mapping=transformer,
                 schema=self.loading_settings.get('schema')
             ).load_data()
             logger.info("✅ Data loading completed successfully")

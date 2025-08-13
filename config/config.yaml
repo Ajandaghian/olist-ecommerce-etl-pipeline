@@ -20,4 +20,13 @@ PRODUCTS_PATH: "olist_products_dataset.csv"
 CATEGORIES_PATH: "product_category_name_translation.csv"
 SELLERS_PATH: "olist_sellers_dataset.csv"
 
-
+# table name
+CUSTOMERS_TABLE: "Customers"
+GEOLOCATION_TABLE: "Geolocation"
+ORDERS_TABLE: "Orders"
+ORDER_ITEMS_TABLE: "Order_items"
+ORDER_PAYMENTS_TABLE: "Order_payments"
+ORDER_REVIEWS_TABLE: "Order_reviews"
+PRODUCTS_TABLE: "Products"
+CATEGORIES_TABLE: "Product_category_name_translation"
+SELLERS_TABLE: "Sellers"

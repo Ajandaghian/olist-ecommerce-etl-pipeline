@@ -12,4 +12,5 @@ def load_config():
         config = safe_load(file)
     return config
 
+
 config = load_config()

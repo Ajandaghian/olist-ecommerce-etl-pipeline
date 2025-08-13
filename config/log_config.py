@@ -1,11 +1,9 @@
 import logging
 import logging.config
-from pathlib import Path
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
 
 LOGGING_CONFIG = {
     "version": 1,
@@ -30,13 +28,14 @@ LOGGING_CONFIG = {
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
+
 def get_logger(name=None):
     """
+
     Get a logger with the specified name.
     If no name is provided, uses the caller's module name.
     """
     return logging.getLogger(name)
-
 
 
 if __name__ == "__main__":
