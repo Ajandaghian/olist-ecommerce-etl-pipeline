@@ -23,11 +23,11 @@ This project implements a **ETL pipeline** for processing Olist's Brazilian e-co
 
 ## 🚀 **Project Goals & Achievements**
 
-✅ **Scalable Architecture**: Modular design supporting multiple data sources and destinations
-✅ **Data Quality Assurance**: 99.7% data integrity with automated validation and cleaning
-✅ **Multi-Warehouse Support**: Load to PostgreSQL, Snowflake, or export to CSV
-✅ **Automated Scheduling**: Built-in scheduler for periodic pipeline execution
-✅ **Type Safety**: Strict data type enforcement and validation across all tables
+- ✅ **Scalable Architecture**: Modular design supporting multiple data sources and destinations
+- ✅ **Data Quality Assurance**: 99.7% data integrity with automated validation and cleaning
+- ✅ **Multi-Warehouse Support**: Load to PostgreSQL, Snowflake, or export to CSV
+- ✅ **Automated Scheduling**: Built-in scheduler for periodic pipeline execution
+- ✅ **Type Safety**: Strict data type enforcement and validation across all tables
 
 ---
 
