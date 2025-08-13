@@ -14,8 +14,8 @@ logger = get_logger(__name__)
 class OrdersCleaner(BaseDataCleaner):
     """Orders-specific cleaning logic."""
 
-    def __init__(self, raw_data: pd.DataFrame):
-        super().__init__(raw_data)
+    def __init__(self, raw_data: pd.DataFrame, table_name: str = config['ORDERS_TABLE']):
+        super().__init__(raw_data, table_name)
 
     def _validate_order_status_dates(self):
         """Validate order status consistency."""
@@ -77,7 +77,7 @@ class OrdersCleaner(BaseDataCleaner):
             self.cleaned_data = self.cleaned_data.drop_duplicates(subset=['order_id'], keep='first')
 
             (self
-                .data_type_validation(data_type_mapping.get('Orders'))
+                .data_type_validation(data_type_mapping.get(self.table_name))
                 ._validate_order_status_dates()
                 ._validate_timestamps_business_logic())
 

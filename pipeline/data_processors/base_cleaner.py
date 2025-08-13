@@ -6,12 +6,11 @@ from typing import List
 import pandas as pd
 
 from config.log_config import get_logger
-
+from config.config import config
 logger = get_logger(__name__)
 
-
 data_type_mapping = {
-    'Orders': {
+    config['ORDERS_TABLE']: {
         'order_id': 'string',
         'customer_id': 'string',
         'order_status': 'category',
@@ -22,7 +21,7 @@ data_type_mapping = {
         'order_estimated_delivery_date': 'datetime64[ns]'
     },
 
-    'Customers': {
+    config['CUSTOMERS_TABLE']: {
         'customer_id': 'string',
         'customer_unique_id': 'string',
         'customer_zip_code_prefix': 'int64',
@@ -31,7 +30,7 @@ data_type_mapping = {
         'created_at': 'datetime64[ns]'
     },
 
-    'Products': {
+    config['PRODUCTS_TABLE']: {
         'product_id': 'string',
         'product_category_name': 'string',
         'product_name_length': 'Int64',
@@ -43,14 +42,14 @@ data_type_mapping = {
         'product_width_cm': 'Int64'
     },
 
-    'Sellers': {
+    config['SELLERS_TABLE']: {
         'seller_id': 'string',
         'seller_zip_code_prefix': 'Int64',
         'seller_city': 'string',
         'seller_state': 'string'
     },
 
-    'OrderItems': {
+    config['ORDER_ITEMS_TABLE']: {
         'order_id': 'string',
         'order_item_id': 'int64',
         'product_id': 'string',
@@ -60,7 +59,7 @@ data_type_mapping = {
         'freight_value': 'float64'
     },
 
-    'OrderPayments': {
+    config['ORDER_PAYMENTS_TABLE']: {
         'order_id': 'string',
         'payment_sequential': 'int64',
         'payment_type': 'string',
@@ -68,7 +67,7 @@ data_type_mapping = {
         'payment_value': 'float64'
     },
 
-    'OrderReviews': {
+    config['ORDER_REVIEWS_TABLE']: {
         'review_id': 'string',
         'order_id': 'string',
         'review_score': 'int64',
@@ -78,7 +77,7 @@ data_type_mapping = {
         'review_answer_timestamp': 'datetime64[ns]'
     },
 
-    'Geolocation': {
+    config['GEOLOCATION_TABLE']: {
         'geolocation_zip_code_prefix': 'int64',
         'geolocation_lat': 'float64',
         'geolocation_lng': 'float64',
@@ -86,7 +85,7 @@ data_type_mapping = {
         'geolocation_state': 'string'
     },
 
-    'ProductCategoryNameTranslation': {
+    config['CATEGORIES_TABLE']: {
         'product_category_name': 'string',
         'product_category_name_english': 'string'
     }

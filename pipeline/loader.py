@@ -1,5 +1,3 @@
-import os
-
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -10,7 +8,7 @@ from pipeline.base_db_connection import BaseDBConnection
 logger = get_logger(__name__)
 
 
-#TODO:
+# TODO:
 # - Implement the logic to load data into PostgreSQL
 # - Add error handling for database connections and data loading
 # - Checking for empty DataFrames before loading
@@ -71,6 +69,7 @@ class DataLoader(BaseDBConnection):
                 logger.info("Connected to Snowflake successfully.")
 
             for table_name, df in self.dataframe_table_mapping.items():
+                logger.info(f"Loading data into {table_name} table in Snowflake.")
                 df.to_sql(
                     table_name,
                     con=self.connector,
@@ -87,7 +86,7 @@ class DataLoader(BaseDBConnection):
 
     def _csv_load_data(self, directory= config['CLEANED_DATA_DIR']):
         """Load data from CSV files into the target database."""
-        for table_name, df  in self.dataframe_table_mapping.items():
+        for table_name, df in self.dataframe_table_mapping.items():
             df.to_csv(f"{directory}/{table_name}.csv", index=False)
             logger.info(f"Data saved to {table_name}.csv in {directory} directory.")
 

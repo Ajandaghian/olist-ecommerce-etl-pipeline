@@ -10,6 +10,7 @@ from config.log_config import get_logger
 from .data_processors.base_cleaner import BaseDataCleaner
 from .data_processors.orders_table_cleaner import OrdersCleaner
 from .data_processors.customers_table_cleaner import CustomersCleaner
+from .data_processors.products_table_cleaner import ProductsCleaner
 
 logger = get_logger(__name__)
 
@@ -17,18 +18,18 @@ class DataCleaningFactory:
     """Factory for creating cleaners."""
 
     cleaner_map: Dict[str, Type[BaseDataCleaner]] = {
-        "Customers": CustomersCleaner,
-        "Geolocation": BaseDataCleaner,
+        config['CUSTOMERS_TABLE']: CustomersCleaner,
+        config['GEOLOCATION_TABLE']: BaseDataCleaner,
 
-        "Orders": OrdersCleaner,
-        "Order_Items": BaseDataCleaner,
-        "Order_Payments": BaseDataCleaner,
-        "Order_Reviews": BaseDataCleaner,
+        config['ORDERS_TABLE']: OrdersCleaner,
+        config['ORDER_ITEMS_TABLE']: BaseDataCleaner,
+        config['ORDER_PAYMENTS_TABLE']: BaseDataCleaner,
+        config['ORDER_REVIEWS_TABLE']: BaseDataCleaner,
 
-        "Products": BaseDataCleaner,
-        "Product_Category_Name_Translation": BaseDataCleaner,
+        config['PRODUCTS_TABLE']: ProductsCleaner,
+        config['CATEGORIES_TABLE']: BaseDataCleaner,
 
-        "Sellers": BaseDataCleaner
+        config['SELLERS_TABLE']: BaseDataCleaner
     }
 
 
@@ -79,8 +80,7 @@ if __name__ == "__main__":
     raw_dataframes = ext.DataExtractor(
             source='CSV',
             file_paths={
-                'Orders': config['RAW_DATA_DIR'] + config['ORDERS_PATH'],
-
+                config['ORDERS_TABLE']: config['RAW_DATA_DIR'] + config['ORDERS_PATH'],
             }
     ).extract()
 

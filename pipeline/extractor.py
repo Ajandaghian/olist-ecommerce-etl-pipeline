@@ -1,10 +1,6 @@
-import os
-
 import pandas as pd
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, text
 
-from config.config import config
 from config.log_config import get_logger
 from pipeline.base_db_connection import BaseDBConnection
 
